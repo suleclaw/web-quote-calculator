@@ -1,7 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-
 interface InquiryFormProps {
   name: string;
   email: string;
@@ -25,29 +23,42 @@ export default function InquiryForm({
 }: InquiryFormProps) {
   if (isSuccess) {
     return (
-      <div className="text-center py-12 space-y-4">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-          <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="text-center py-10 space-y-5 animate-scale-in">
+        <div className="success-ring w-16 h-16 rounded-full flex items-center justify-center mx-auto">
+          <svg className="w-8 h-8 text-[#34d399]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h3 className="text-xl font-semibold text-gray-900">Inquiry Sent!</h3>
-        <p className="text-gray-600 max-w-sm mx-auto">
-          Your quote request has been sent. Dami will get back to you soon.
-        </p>
+        <div>
+          <h3 className="text-xl font-bold text-white mb-1.5">Inquiry Sent!</h3>
+          <p className="text-sm text-[#94a3b8] max-w-xs mx-auto">
+            Your quote request is in. Dami will review your requirements and reach out within 24 hours.
+          </p>
+        </div>
+        <div className="inline-flex items-center gap-2 text-xs text-[#64748b] bg-[rgba(52,211,153,0.08)] border border-[rgba(52,211,153,0.2)] rounded-full px-4 py-2">
+          <svg className="w-3.5 h-3.5 text-[#34d399]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          Check your inbox for a confirmation email
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-500">
-        Enter your details to submit your quote inquiry. Dami will review your requirements and reach out to you.
-      </p>
+      <div className="flex items-start gap-3 p-4 rounded-xl bg-[rgba(129,140,248,0.05)] border border-[rgba(129,140,248,0.1)]">
+        <svg className="w-4 h-4 text-[#818cf8] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p className="text-sm text-[#94a3b8]">
+          Your quote details will be attached. Dami will review your requirements and get back to you within 24 hours.
+        </p>
+      </div>
 
       <div className="space-y-3">
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-1.5">
+          <label htmlFor="name" className="block text-sm font-medium text-[#94a3b8] pl-1">
             Your Name
           </label>
           <input
@@ -56,12 +67,13 @@ export default function InquiryForm({
             value={name}
             onChange={(e) => onNameChange(e.target.value)}
             placeholder="Ada Lovelace"
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="form-input"
+            autoComplete="name"
           />
         </div>
 
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-1.5">
+          <label htmlFor="email" className="block text-sm font-medium text-[#94a3b8] pl-1">
             Email Address
           </label>
           <input
@@ -70,13 +82,17 @@ export default function InquiryForm({
             value={email}
             onChange={(e) => onEmailChange(e.target.value)}
             placeholder="ada@example.com"
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="form-input"
+            autoComplete="email"
           />
         </div>
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+        <div className="p-3 rounded-lg bg-[rgba(248,113,113,0.08)] border border-[rgba(248,113,113,0.2)] text-sm text-[#f87171] flex items-center gap-2 animate-fade-in">
+          <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
           {error}
         </div>
       )}
@@ -84,9 +100,24 @@ export default function InquiryForm({
       <button
         onClick={onSubmit}
         disabled={isSubmitting || !name || !email}
-        className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="btn-primary w-full py-3.5 mt-2"
       >
-        {isSubmitting ? 'Sending...' : 'Submit Inquiry'}
+        {isSubmitting ? (
+          <span className="flex items-center justify-center gap-2">
+            <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            Sending...
+          </span>
+        ) : (
+          <span className="flex items-center justify-center gap-2">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+            Submit Inquiry
+          </span>
+        )}
       </button>
     </div>
   );

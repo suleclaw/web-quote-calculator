@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import StepIndicator from '@/components/StepIndicator';
 import PageSelector from '@/components/PageSelector';
 import FeatureSelector from '@/components/FeatureSelector';
@@ -8,6 +8,13 @@ import QuoteSummary from '@/components/QuoteSummary';
 import InquiryForm from '@/components/InquiryForm';
 
 const TOTAL_STEPS = 4;
+
+const STEP_TITLES = [
+  { title: 'Choose Your Pages', sub: 'Select the pages your website needs' },
+  { title: 'Add Extra Features', sub: 'Optional add-ons for advanced functionality' },
+  { title: 'Review Your Quote', sub: 'Your estimated project cost at a glance' },
+  { title: 'Submit Your Inquiry', sub: 'Get in touch to kick things off' },
+];
 
 export default function Home() {
   const [step, setStep] = useState(1);
@@ -18,6 +25,11 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const canProceed = () => {
     if (step === 1) return selectedPages.length > 0;
@@ -45,7 +57,7 @@ export default function Home() {
       }
 
       setIsSuccess(true);
-    } catch (err) {
+    } catch {
       setError('Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -53,91 +65,158 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Website Quote Calculator</h1>
-          <p className="text-gray-600">Build your quote step by step</p>
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Ambient background */}
+      <div className="ambient-glow" />
+      <div className="bg-grid absolute inset-0" />
+
+      {/* Content */}
+      <div className={`relative z-10 min-h-screen flex flex-col ${mounted ? '' : 'opacity-0'}`}
+           style={{ transition: 'opacity 0.5s ease' }}>
+
+        {/* Header */}
+        <header className="pt-10 pb-6 px-4 text-center">
+          <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[rgba(129,140,248,0.25)] bg-[rgba(129,140,248,0.08)] text-xs font-medium text-[#818cf8] mb-6 animate-fade-in`}
+               style={{ animationDelay: '0ms' }}>
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Instant estimate · No commitment
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-2 animate-fade-in-up">
+            Website Quote Calculator
+          </h1>
+          <p className="text-[#94a3b8] text-base max-w-md mx-auto animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+            Build your perfect website quote in minutes — transparent pricing, no surprises.
+          </p>
+        </header>
+
+        {/* Step Indicator */}
+        <div className="px-4 mb-6 animate-fade-in" style={{ animationDelay: '200ms' }}>
+          <StepIndicator currentStep={step} totalSteps={TOTAL_STEPS} />
         </div>
 
-        <StepIndicator currentStep={step} totalSteps={TOTAL_STEPS} />
+        {/* Main card */}
+        <main className="flex-1 px-4 pb-8">
+          <div className="max-w-2xl mx-auto">
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          {step === 1 && (
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Step 1: Choose Your Pages</h2>
-              <PageSelector selected={selectedPages} onChange={setSelectedPages} />
+            {/* Step header */}
+            <div className={`mb-5 animate-fade-in-up`} style={{ animationDelay: '250ms' }}>
+              <h2 className="text-xl font-bold text-white mb-0.5">
+                {STEP_TITLES[step - 1].title}
+              </h2>
+              <p className="text-sm text-[#64748b]">
+                {STEP_TITLES[step - 1].sub}
+              </p>
             </div>
-          )}
 
-          {step === 2 && (
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Step 2: Add Extra Features</h2>
-              <FeatureSelector selected={selectedFeatures} onChange={setSelectedFeatures} />
-            </div>
-          )}
+            {/* Step content card */}
+            <div className="card p-6 sm:p-8 animate-scale-in" style={{ animationDelay: '280ms' }}>
 
-          {step === 3 && (
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Step 3: Review Your Quote</h2>
-              <QuoteSummary selectedPageIds={selectedPages} selectedFeatureIds={selectedFeatures} />
-            </div>
-          )}
-
-          {step === 4 && (
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Step 4: Submit Your Inquiry</h2>
-              <QuoteSummary selectedPageIds={selectedPages} selectedFeatureIds={selectedFeatures} />
-              <div className="mt-6">
-                <InquiryForm
-                  name={clientName}
-                  email={clientEmail}
-                  onNameChange={setClientName}
-                  onEmailChange={setClientEmail}
-                  onSubmit={handleSubmit}
-                  isSubmitting={isSubmitting}
-                  isSuccess={isSuccess}
-                  error={error}
-                />
-              </div>
-            </div>
-          )}
-
-          {step < 4 && (
-            <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
-              <button
-                onClick={() => setStep((s) => Math.max(1, s - 1))}
-                disabled={step === 1}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Back
-              </button>
-
-              {step < 3 && (
-                <button
-                  onClick={() => setStep((s) => s + 1)}
-                  disabled={!canProceed()}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Next
-                </button>
+              {step === 1 && (
+                <div className="animate-slide-in-right">
+                  <PageSelector selected={selectedPages} onChange={setSelectedPages} />
+                </div>
               )}
 
-              {step === 3 && (
-                <button
-                  onClick={() => setStep(4)}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Proceed to Submit
-                </button>
+              {step === 2 && (
+                <div className="animate-slide-in-right">
+                  <FeatureSelector selected={selectedFeatures} onChange={setSelectedFeatures} />
+                </div>
+              )}
+
+              {(step === 3 || step === 4) && (
+                <div className="animate-scale-in">
+                  <QuoteSummary selectedPageIds={selectedPages} selectedFeatureIds={selectedFeatures} />
+                </div>
+              )}
+
+              {step === 4 && !isSuccess && (
+                <div className="mt-6 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+                  <InquiryForm
+                    name={clientName}
+                    email={clientEmail}
+                    onNameChange={setClientName}
+                    onEmailChange={setClientEmail}
+                    onSubmit={handleSubmit}
+                    isSubmitting={isSubmitting}
+                    isSuccess={isSuccess}
+                    error={error}
+                  />
+                </div>
+              )}
+
+              {step === 4 && isSuccess && (
+                <div className="animate-scale-in">
+                  <InquiryForm
+                    name={clientName}
+                    email={clientEmail}
+                    onNameChange={setClientName}
+                    onEmailChange={setClientEmail}
+                    onSubmit={handleSubmit}
+                    isSubmitting={isSubmitting}
+                    isSuccess={isSuccess}
+                    error={error}
+                  />
+                </div>
+              )}
+
+              {/* Navigation */}
+              {step < 4 && (
+                <div className="flex items-center justify-between mt-8 pt-6 border-t border-[rgba(255,255,255,0.06)]">
+                  <button
+                    onClick={() => setStep((s) => Math.max(1, s - 1))}
+                    disabled={step === 1}
+                    className="btn-secondary"
+                  >
+                    <span className="flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      Back
+                    </span>
+                  </button>
+
+                  {step < 3 && (
+                    <button
+                      onClick={() => setStep((s) => s + 1)}
+                      disabled={!canProceed()}
+                      className="btn-primary"
+                    >
+                      <span className="flex items-center gap-2">
+                        Continue
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </span>
+                    </button>
+                  )}
+
+                  {step === 3 && (
+                    <button
+                      onClick={() => setStep(4)}
+                      className="btn-primary"
+                    >
+                      <span className="flex items-center gap-2">
+                        Proceed to Submit
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                      </span>
+                    </button>
+                  )}
+                </div>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        </main>
 
-        <p className="text-center text-xs text-gray-400 mt-8">
-          All quotes are estimates. Final pricing may vary based on project specifics.
-        </p>
+        {/* Footer */}
+        <footer className="px-4 pb-8 text-center">
+          <p className="text-xs text-[#374151]">
+            All quotes are estimates. Final pricing may vary based on project specifics.
+          </p>
+        </footer>
       </div>
     </div>
   );

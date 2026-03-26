@@ -1,7 +1,5 @@
 'use client';
 
-import { PAGES_INCLUDED } from '@/lib/pricing';
-
 interface StepIndicatorProps {
   currentStep: number;
   totalSteps: number;
@@ -11,34 +9,38 @@ const STEP_LABELS = ['Pages', 'Features', 'Review', 'Submit'];
 
 export default function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
   return (
-    <div className="flex items-center justify-center gap-2 mb-8">
-      {Array.from({ length: totalSteps }, (_, i) => {
-        const stepNum = i + 1;
-        const isActive = stepNum === currentStep;
-        const isCompleted = stepNum < currentStep;
+    <div className="flex items-center justify-center">
+      <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl border border-[rgba(255,255,255,0.06)] bg-[rgba(30,33,48,0.8)] backdrop-blur-sm">
+        {Array.from({ length: totalSteps }, (_, i) => {
+          const stepNum = i + 1;
+          const isActive = stepNum === currentStep;
+          const isCompleted = stepNum < currentStep;
 
-        return (
-          <div key={i} className="flex items-center gap-2">
-            <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                isCompleted
-                  ? 'bg-green-600 text-white'
-                  : isActive
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-500'
-              }`}
-            >
-              {isCompleted ? '✓' : stepNum}
+          return (
+            <div key={i} className="flex items-center">
+              <div className="step-pill">
+                <div className={`step-dot ${isActive ? 'active' : isCompleted ? 'completed' : 'inactive'}`}
+                     style={isActive ? { animation: 'pulse-glow 2s ease-in-out infinite' } : {}}>
+                  {isCompleted ? (
+                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <span>{stepNum}</span>
+                  )}
+                </div>
+                <span className={`step-label ${isActive ? 'active font-semibold' : isCompleted ? 'active' : 'inactive'}`}>
+                  {STEP_LABELS[i]}
+                </span>
+              </div>
+
+              {i < totalSteps - 1 && (
+                <div className={`step-connector mx-2 ${isCompleted ? 'completed' : ''}`} />
+              )}
             </div>
-            <span className={`text-sm hidden sm:block ${isActive ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
-              {STEP_LABELS[i]}
-            </span>
-            {i < totalSteps - 1 && (
-              <div className={`w-8 h-0.5 ${isCompleted ? 'bg-green-600' : 'bg-gray-200'}`} />
-            )}
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }
