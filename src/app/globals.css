@@ -431,8 +431,131 @@ body {
   outline-offset: 2px;
 }
 
+/* Theme toggle */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 50;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.12);
+  transform: scale(1.05);
+}
+
+.light .theme-toggle:hover {
+  border-color: rgba(0,0,0,0.12);
+}
+
+.light .theme-toggle {
+  border-color: rgba(0,0,0,0.08);
+}
+
 /* Selection color */
 ::selection {
   background: rgba(129,140,248,0.3);
   color: var(--text-primary);
+}
+
+/* ==================== LIGHT THEME ==================== */
+.light {
+  --bg-base: #f8fafc;
+  --bg-elevated: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-active: rgba(99, 102, 241, 0.4);
+  --accent: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.15);
+  --accent-dark: #4f46e5;
+  --accent-amber: #d97706;
+  --accent-amber-glow: rgba(217, 119, 6, 0.1);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --success: #059669;
+  --success-bg: rgba(5, 150, 105, 0.08);
+  --error: #dc2626;
+  --error-bg: rgba(220, 38, 38, 0.08);
+}
+
+/* Light theme background grid */
+.light .bg-grid {
+  background-image:
+    linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+}
+
+/* Light theme ambient glow */
+.light .ambient-glow {
+  background: radial-gradient(ellipse, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+}
+
+/* Light theme card hover */
+.light .card:hover {
+  border-color: rgba(0,0,0,0.1);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+}
+
+/* Light theme selection card */
+.light .select-card {
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .select-card:hover {
+  border-color: rgba(0,0,0,0.12);
+  background: var(--bg-card-hover);
+}
+
+.light .select-card.selected {
+  background: rgba(99, 102, 241, 0.06);
+}
+
+/* Light theme buttons */
+.light .btn-secondary {
+  color: var(--text-secondary);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .btn-secondary:hover:not(:disabled) {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+/* Light theme form inputs */
+.light .form-input {
+  background: var(--bg-elevated);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: var(--text-primary);
+}
+
+.light .form-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* Light theme step indicator */
+.light .step-dot.inactive {
+  background: var(--bg-elevated);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: var(--text-muted);
+}
+
+.light .step-connector {
+  background: rgba(0, 0, 0, 0.06);
 }
