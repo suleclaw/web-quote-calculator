@@ -2,21 +2,60 @@ import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { PAGES, FEATURES, calculateQuote } from '@/lib/pricing';
 
+// Rate limiting
+const rateLimits = new Map<string, { count: number; resetAt: number }>();
+
+function rateLimit(key: string, limit: number, windowMs: number): boolean {
+  const now = Date.now();
+  const entry = rateLimits.get(key);
+  if (!entry || now > entry.resetAt) {
+    rateLimits.set(key, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  if (entry.count >= limit) return false;
+  entry.count++;
+  return true;
+}
+
 const config = {
-  host: 'smtp.gmail.com',
-  port: 587,
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT || '587'),
   secure: false,
-  user: 'suleclaw@gmail.com',
-  pass: 'qozy yyqk diyy ygfe',
+  user: process.env.SMTP_USER,
+  pass: process.env.SMTP_PASS,
 };
 
 export async function POST(request: NextRequest) {
+  // Rate limit: 10 requests per minute per IP
+  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+  if (!rateLimit(`inquiry:${ip}`, 10, 60000)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   try {
     const body = await request.json();
     const { name, email, selectedPageIds, selectedFeatureIds, siteType, couponCode, couponDiscount } = body;
 
+    // Validate required fields exist
     if (!name || !email || !selectedPageIds || !selectedFeatureIds || !siteType) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    // Sanitize and validate name
+    const sanitizedName = body.name?.slice(0, 200).trim();
+    if (!sanitizedName || sanitizedName.length < 1) {
+      return NextResponse.json({ error: 'Invalid name' }, { status: 400 });
+    }
+
+    // Validate siteType
+    if (!['one-page', 'multi-page'].includes(siteType)) {
+      return NextResponse.json({ error: 'Invalid site type' }, { status: 400 });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
     }
 
     const quote = calculateQuote(selectedPageIds, selectedFeatureIds);
@@ -46,7 +85,7 @@ export async function POST(request: NextRequest) {
 New Website Quote Inquiry
 
 Client Details:
-  Name: ${name}
+  Name: ${sanitizedName}
   Email: ${email}
 
 Website Type: ${siteType === 'one-page' ? 'One-Page Website' : 'Multi-Page Website'}
@@ -81,8 +120,8 @@ Sent from Web Quote Calculator
     `.trim();
 
     const subject = hasCoupon
-      ? `New Inquiry from ${name} — £${finalTotal} quote (${couponDiscount}% off)`
-      : `New Inquiry from ${name} — £${quote.total} quote`;
+      ? `New Inquiry from ${sanitizedName} — £${finalTotal} quote (${couponDiscount}% off)`
+      : `New Inquiry from ${sanitizedName} — £${quote.total} quote`;
 
     await transporter.sendMail({
       from: config.user,
