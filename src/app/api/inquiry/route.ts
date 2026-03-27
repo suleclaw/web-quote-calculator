@@ -51,7 +51,7 @@ Extra Features:
 ${featureList}
 
 Quote Breakdown:
-  Base website (${selectedPages.length} page${selectedPages.length === 1 ? '' : 's'}): £${quote.basePrice}
+  Base website: £${quote.basePrice}
   Extra pages (${quote.extraPages} × £50): £${quote.pagesCost}
   Features: £${quote.featuresCost}
   ---------------------------------

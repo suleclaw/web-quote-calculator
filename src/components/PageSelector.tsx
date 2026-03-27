@@ -5,6 +5,8 @@ import { PAGES } from '@/lib/pricing';
 interface PageSelectorProps {
   selected: string[];
   onChange: (selected: string[]) => void;
+  siteType: 'one-page' | 'multi-page';
+  onSiteTypeChange: (siteType: 'one-page' | 'multi-page') => void;
 }
 
 const PAGE_ICONS: Record<string, React.ReactNode> = {
@@ -60,37 +62,83 @@ const PAGE_ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-export default function PageSelector({ selected, onChange }: PageSelectorProps) {
+export default function PageSelector({ selected, onChange, siteType, onSiteTypeChange }: PageSelectorProps) {
+  const isOnePage = siteType === 'one-page';
+  const maxPages = isOnePage ? 1 : 4;
+
   const togglePage = (id: string) => {
     if (selected.includes(id)) {
       onChange(selected.filter((p) => p !== id));
     } else {
-      onChange([...selected, id]);
+      if (isOnePage) {
+        onChange([id]);
+      } else if (selected.length < maxPages) {
+        onChange([...selected, id]);
+      }
+    }
+  };
+
+  const handleSiteTypeChange = (type: 'one-page' | 'multi-page') => {
+    onSiteTypeChange(type);
+    if (type === 'one-page') {
+      onChange(selected.includes('home') ? ['home'] : []);
     }
   };
 
   return (
     <div>
+      {/* Site type toggle */}
+      <div className="flex items-center gap-3 mb-6 px-1">
+        <span className="text-xs font-medium text-[#64748b]">Website type:</span>
+        <div className="flex bg-[rgba(255,255,255,0.04)] rounded-lg p-0.5 border border-[rgba(255,255,255,0.06)]">
+          <button
+            onClick={() => handleSiteTypeChange('one-page')}
+            className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
+              isOnePage
+                ? 'bg-[#818cf8] text-white shadow-sm'
+                : 'text-[#94a3b8] hover:text-white'
+            }`}
+          >
+            One page
+          </button>
+          <button
+            onClick={() => handleSiteTypeChange('multi-page')}
+            className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
+              !isOnePage
+                ? 'bg-[#818cf8] text-white shadow-sm'
+                : 'text-[#94a3b8] hover:text-white'
+            }`}
+          >
+            Multi-page
+          </button>
+        </div>
+        <span className="ml-auto text-xs text-[#818cf8] font-medium">£250</span>
+      </div>
+
+      {/* Pages info */}
       <div className="flex items-center gap-3 mb-5 px-1">
         <div className="flex items-center gap-1.5 text-xs text-[#64748b]">
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
           </svg>
-          First 4 pages included in base price
+          {isOnePage ? 'Single landing page' : 'First 4 pages included'}
         </div>
         <div className="ml-auto text-xs text-[#818cf8] bg-[rgba(129,140,248,0.1)] border border-[rgba(129,140,248,0.2)] rounded-full px-2.5 py-0.5 font-medium">
-          {selected.length} selected
+          {isOnePage ? '1 page' : `${selected.length} selected`}
         </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 stagger-children">
         {PAGES.map((page) => {
           const isSelected = selected.includes(page.id);
+          const isDisabled = isOnePage && page.id !== 'home' && !selected.includes('home');
+
           return (
             <button
               key={page.id}
               onClick={() => togglePage(page.id)}
-              className={`select-card p-4 ${isSelected ? 'selected' : ''}`}
+              disabled={isDisabled}
+              className={`select-card p-4 ${isSelected ? 'selected' : ''} ${isDisabled ? 'opacity-40 cursor-not-allowed' : ''}`}
             >
               <div className="flex items-start gap-3 relative z-10">
                 <div

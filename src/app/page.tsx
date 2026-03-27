@@ -18,6 +18,7 @@ const STEP_TITLES = [
 
 export default function Home() {
   const [step, setStep] = useState(1);
+  const [siteType, setSiteType] = useState<'one-page' | 'multi-page'>('multi-page');
   const [selectedPages, setSelectedPages] = useState<string[]>(['home']);
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [clientName, setClientName] = useState('');
@@ -115,7 +116,7 @@ export default function Home() {
 
               {step === 1 && (
                 <div className="animate-slide-in-right">
-                  <PageSelector selected={selectedPages} onChange={setSelectedPages} />
+                  <PageSelector selected={selectedPages} onChange={setSelectedPages} siteType={siteType} onSiteTypeChange={setSiteType} />
                 </div>
               )}
 

@@ -3,10 +3,9 @@ import { render, screen } from '@testing-library/react';
 import QuoteSummary from './QuoteSummary';
 
 describe('QuoteSummary', () => {
-  it('displays base price for multi-page', () => {
+  it('displays base price £250', () => {
     render(<QuoteSummary selectedPageIds={[]} selectedFeatureIds={[]} />);
-    // Empty = multi-page base (£350)
-    expect(screen.getAllByText((content) => content.includes('£350')).length).toBeGreaterThan(0);
+    expect(screen.getAllByText((content) => content.includes('£250')).length).toBeGreaterThan(0);
   });
 
   it('displays selected pages', () => {
@@ -33,7 +32,7 @@ describe('QuoteSummary', () => {
   it('displays total estimate', () => {
     render(<QuoteSummary selectedPageIds={['home']} selectedFeatureIds={['ai-chatbot']} />);
     expect(screen.getByText('Total Estimate')).toBeDefined();
-    expect(screen.getByText('£310')).toBeDefined(); // £210 base + £100 chatbot
+    expect(screen.getByText('£350')).toBeDefined(); // £250 base + £100 chatbot
   });
 
   it('shows trust signals', () => {

@@ -47,8 +47,8 @@ src/
 
 | Package | Price |
 |---------|-------|
-| One-page website | £210 |
-| Multi-page website (up to 4 pages) | £350 |
+| One-page website | £250 |
+| Multi-page website (up to 4 pages) | £250 |
 | Additional pages | £50 each |
 
 ### Optional Features

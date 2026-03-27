@@ -1,5 +1,4 @@
-export const BASE_PRICE = 210;       // 1-page website
-export const MULTI_PAGE_PRICE = 350; // 4-page website
+export const BASE_PRICE = 250;       // Flat rate for all websites
 export const PAGES_INCLUDED = 4;
 export const PRICE_PER_EXTRA_PAGE = 50;
 
@@ -31,10 +30,10 @@ export const FEATURES = [
 export function calculateQuote(selectedPageIds: string[], selectedFeatureIds: string[]) {
   const pageCount = selectedPageIds.length;
 
-  // Base price: 1 page = £210, 4 pages = £350
-  const basePrice = pageCount === 1 ? BASE_PRICE : MULTI_PAGE_PRICE;
+  // Flat base price of £250
+  const basePrice = BASE_PRICE;
 
-  // Extra pages beyond the 4 included in multi-page
+  // Extra pages beyond the 4 included
   const extraPages = pageCount > PAGES_INCLUDED ? pageCount - PAGES_INCLUDED : 0;
   const pagesCost = extraPages * PRICE_PER_EXTRA_PAGE;
 
