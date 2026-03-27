@@ -13,7 +13,7 @@ const config = {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, selectedPageIds, selectedFeatureIds, siteType } = body;
+    const { name, email, selectedPageIds, selectedFeatureIds, siteType, couponCode, couponDiscount } = body;
 
     if (!name || !email || !selectedPageIds || !selectedFeatureIds || !siteType) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -23,6 +23,11 @@ export async function POST(request: NextRequest) {
 
     const selectedPages = PAGES.filter((p) => selectedPageIds.includes(p.id));
     const selectedFeatures = FEATURES.filter((f) => selectedFeatureIds.includes(f.id));
+
+    // Calculate discounted total if coupon applied
+    const hasCoupon = couponCode && couponDiscount && couponDiscount > 0;
+    const discountAmount = hasCoupon ? Math.round((quote.total * couponDiscount) / 100) : 0;
+    const finalTotal = quote.total - discountAmount;
 
     const transporter = nodemailer.createTransport({
       host: config.host,
@@ -37,7 +42,7 @@ export async function POST(request: NextRequest) {
     const pageList = selectedPages.map((p) => `  - ${p.label}`).join('\n') || '  - None';
     const featureList = selectedFeatures.map((f) => `  - ${f.label}: £${f.price}`).join('\n') || '  - None';
 
-    const emailText = `
+    let emailText = `
 New Website Quote Inquiry
 
 Client Details:
@@ -57,21 +62,37 @@ Quote Breakdown:
   Extra pages (${quote.extraPages} × £50): £${quote.pagesCost}
   Features: £${quote.featuresCost}
   ---------------------------------
-  Total: £${quote.total}
+  Subtotal: £${quote.total}
+`;
 
+    if (hasCoupon) {
+      emailText += `  Coupon (${couponCode}): -£${discountAmount} (${couponDiscount}% off)
+  ---------------------------------
+  Total: £${finalTotal}
+`;
+    } else {
+      emailText += `  Total: £${quote.total}
+`;
+    }
+
+    emailText += `
 ---
 Sent from Web Quote Calculator
     `.trim();
+
+    const subject = hasCoupon
+      ? `New Inquiry from ${name} — £${finalTotal} quote (${couponDiscount}% off)`
+      : `New Inquiry from ${name} — £${quote.total} quote`;
 
     await transporter.sendMail({
       from: config.user,
       to: config.user,
       replyTo: email,
-      subject: `New Inquiry from ${name} — £${quote.total} quote`,
+      subject,
       text: emailText,
     });
 
-    return NextResponse.json({ success: true, total: quote.total });
+    return NextResponse.json({ success: true, total: finalTotal, originalTotal: quote.total, discountAmount });
   } catch (error) {
     console.error('Inquiry error:', error);
     return NextResponse.json({ error: 'Failed to send inquiry' }, { status: 500 });

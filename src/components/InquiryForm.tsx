@@ -3,8 +3,13 @@
 interface InquiryFormProps {
   name: string;
   email: string;
+  couponCode: string;
+  couponStatus: 'idle' | 'valid' | 'invalid' | 'error';
+  couponDiscount: number | null;
   onNameChange: (v: string) => void;
   onEmailChange: (v: string) => void;
+  onCouponChange: (v: string) => void;
+  onCouponBlur: () => void;
   onSubmit: () => Promise<void>;
   isSubmitting: boolean;
   isSuccess: boolean;
@@ -14,8 +19,13 @@ interface InquiryFormProps {
 export default function InquiryForm({
   name,
   email,
+  couponCode,
+  couponStatus,
+  couponDiscount,
   onNameChange,
   onEmailChange,
+  onCouponChange,
+  onCouponBlur,
   onSubmit,
   isSubmitting,
   isSuccess,
@@ -86,6 +96,50 @@ export default function InquiryForm({
             autoComplete="email"
           />
         </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="coupon" className="block text-sm font-medium text-[#94a3b8] pl-1">
+            Coupon Code <span className="text-[#64748b]">(optional)</span>
+          </label>
+          <input
+            id="coupon"
+            type="text"
+            value={couponCode}
+            onChange={(e) => onCouponChange(e.target.value.toUpperCase())}
+            onBlur={onCouponBlur}
+            placeholder="e.g. DAMI20"
+            className="form-input font-mono tracking-wider"
+            autoComplete="off"
+          />
+        </div>
+
+        {/* Coupon validation feedback */}
+        {couponStatus === 'valid' && couponDiscount && (
+          <div className="p-3 rounded-lg bg-[rgba(52,211,153,0.08)] border border-[rgba(52,211,153,0.2)] text-sm text-[#34d399] flex items-center gap-2 animate-fade-in">
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            {couponDiscount}% discount applied!
+          </div>
+        )}
+
+        {couponStatus === 'invalid' && (
+          <div className="p-3 rounded-lg bg-[rgba(248,113,113,0.08)] border border-[rgba(248,113,113,0.2)] text-sm text-[#f87171] flex items-center gap-2 animate-fade-in">
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Invalid, expired, or already used coupon
+          </div>
+        )}
+
+        {couponStatus === 'error' && (
+          <div className="p-3 rounded-lg bg-[rgba(248,113,113,0.08)] border border-[rgba(248,113,113,0.2)] text-sm text-[#f87171] flex items-center gap-2 animate-fade-in">
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Error validating coupon
+          </div>
+        )}
       </div>
 
       {error && (

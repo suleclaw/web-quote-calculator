@@ -6,14 +6,27 @@ interface QuoteSummaryProps {
   selectedPageIds: string[];
   selectedFeatureIds: string[];
   siteType: 'one-page' | 'multi-page';
+  couponDiscount?: number | null;
+  couponCode?: string | null;
+  originalTotal?: number | null;
 }
 
-export default function QuoteSummary({ selectedPageIds, selectedFeatureIds, siteType }: QuoteSummaryProps) {
+export default function QuoteSummary({
+  selectedPageIds,
+  selectedFeatureIds,
+  siteType,
+  couponDiscount,
+  couponCode,
+  originalTotal,
+}: QuoteSummaryProps) {
   const quote = calculateQuote(selectedPageIds, selectedFeatureIds);
   const selectedPages = PAGES.filter((p) => selectedPageIds.includes(p.id));
   const selectedFeatures = FEATURES.filter((f) => selectedFeatureIds.includes(f.id));
 
   const hasExtraPages = quote.extraPages > 0;
+  const hasCoupon = couponDiscount && couponDiscount > 0;
+  const discountAmount = hasCoupon && originalTotal ? Math.round((originalTotal * couponDiscount) / 100) : 0;
+  const finalTotal = hasCoupon ? originalTotal! - discountAmount : quote.total;
 
   return (
     <div className="space-y-4">
@@ -81,11 +94,35 @@ export default function QuoteSummary({ selectedPageIds, selectedFeatureIds, site
             </div>
           )}
 
+          {/* Coupon discount */}
+          {hasCoupon && (
+            <div className="flex items-center justify-between pt-2 mt-2 border-t border-[rgba(52,211,153,0.15)] animate-fade-in">
+              <div className="flex items-center gap-2 text-[#34d399]">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+                Coupon ({couponCode}): -{couponDiscount}%
+              </div>
+              <span className="font-medium text-[#34d399]">-£{discountAmount}</span>
+            </div>
+          )}
+
           {/* Total */}
           <div className="flex items-center justify-between pt-3 mt-2 border-t border-[rgba(255,255,255,0.08)]">
             <span className="text-[#94a3b8] font-medium">Total Estimate</span>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-extrabold text-white count-up">£{quote.total}</span>
+              {hasCoupon ? (
+                <>
+                  <span className="text-lg font-extrabold text-[#94a3b8] line-through count-up">
+                    £{originalTotal}
+                  </span>
+                  <span className="text-2xl font-extrabold text-[#34d399] count-up">
+                    £{finalTotal}
+                  </span>
+                </>
+              ) : (
+                <span className="text-2xl font-extrabold text-white count-up">£{quote.total}</span>
+              )}
               <div className="text-xs text-[#64748b]">GBP</div>
             </div>
           </div>

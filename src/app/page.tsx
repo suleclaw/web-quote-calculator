@@ -16,6 +16,8 @@ const STEP_TITLES = [
   { title: 'Submit Your Inquiry', sub: 'Get in touch to kick things off' },
 ];
 
+type CouponStatus = 'idle' | 'valid' | 'invalid' | 'error';
+
 export default function Home() {
   const [step, setStep] = useState(1);
   const [siteType, setSiteType] = useState<'one-page' | 'multi-page'>('multi-page');
@@ -23,6 +25,9 @@ export default function Home() {
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
+  const [couponCode, setCouponCode] = useState('');
+  const [couponStatus, setCouponStatus] = useState<CouponStatus>('idle');
+  const [couponDiscount, setCouponDiscount] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,11 +42,49 @@ export default function Home() {
     return true;
   };
 
+  const handleCouponBlur = async () => {
+    if (!couponCode.trim() || !clientEmail.trim()) {
+      setCouponStatus('idle');
+      setCouponDiscount(null);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/validate-coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: couponCode, email: clientEmail }),
+      });
+
+      const data = await res.json();
+
+      if (data.valid) {
+        setCouponStatus('valid');
+        setCouponDiscount(data.discountPercent);
+      } else {
+        setCouponStatus('invalid');
+        setCouponDiscount(null);
+      }
+    } catch {
+      setCouponStatus('error');
+      setCouponDiscount(null);
+    }
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setError(null);
 
     try {
+      // Apply coupon if valid
+      if (couponStatus === 'valid' && couponCode && clientEmail) {
+        await fetch('/api/apply-coupon', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: couponCode, email: clientEmail }),
+        });
+      }
+
       const res = await fetch('/api/inquiry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -51,6 +94,8 @@ export default function Home() {
           selectedPageIds: selectedPages,
           selectedFeatureIds: selectedFeatures,
           siteType,
+          couponCode: couponStatus === 'valid' ? couponCode : undefined,
+          couponDiscount: couponStatus === 'valid' ? couponDiscount : undefined,
         }),
       });
 
@@ -129,7 +174,14 @@ export default function Home() {
 
               {(step === 3 || step === 4) && (
                 <div className="animate-scale-in">
-                  <QuoteSummary selectedPageIds={selectedPages} selectedFeatureIds={selectedFeatures} siteType={siteType} />
+                  <QuoteSummary
+                    selectedPageIds={selectedPages}
+                    selectedFeatureIds={selectedFeatures}
+                    siteType={siteType}
+                    couponDiscount={couponStatus === 'valid' ? couponDiscount : null}
+                    couponCode={couponStatus === 'valid' ? couponCode : null}
+                    originalTotal={null}
+                  />
                 </div>
               )}
 
@@ -138,8 +190,13 @@ export default function Home() {
                   <InquiryForm
                     name={clientName}
                     email={clientEmail}
+                    couponCode={couponCode}
+                    couponStatus={couponStatus}
+                    couponDiscount={couponDiscount}
                     onNameChange={setClientName}
                     onEmailChange={setClientEmail}
+                    onCouponChange={setCouponCode}
+                    onCouponBlur={handleCouponBlur}
                     onSubmit={handleSubmit}
                     isSubmitting={isSubmitting}
                     isSuccess={isSuccess}
@@ -153,8 +210,13 @@ export default function Home() {
                   <InquiryForm
                     name={clientName}
                     email={clientEmail}
+                    couponCode={couponCode}
+                    couponStatus={couponStatus}
+                    couponDiscount={couponDiscount}
                     onNameChange={setClientName}
                     onEmailChange={setClientEmail}
+                    onCouponChange={setCouponCode}
+                    onCouponBlur={handleCouponBlur}
                     onSubmit={handleSubmit}
                     isSubmitting={isSubmitting}
                     isSuccess={isSuccess}
@@ -223,4 +285,3 @@ export default function Home() {
     </div>
   );
 }
-// test
