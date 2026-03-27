@@ -29,7 +29,7 @@ export default function StepIndicator({ currentStep, totalSteps }: StepIndicator
                     <span>{stepNum}</span>
                   )}
                 </div>
-                <span className={`step-label ${isActive ? 'active font-semibold' : isCompleted ? 'active' : 'inactive'}`}>
+                <span className={`step-label hidden sm:inline ${isActive ? 'active font-semibold' : isCompleted ? 'active' : 'inactive'}`}>
                   {STEP_LABELS[i]}
                 </span>
               </div>
