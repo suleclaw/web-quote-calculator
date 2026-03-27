@@ -1,33 +1,31 @@
+import { createClient, RedisClientType } from 'redis';
 import { promises as fs } from 'fs';
 import path from 'path';
 
-// Check if Upstash Redis is configured
+// Check if Redis is configured
 function isRedisConfigured(): boolean {
   return !!process.env.REDIS_URL;
 }
 
-// Upstash Redis client
-interface UpstashRedis {
-  get: (key: string) => Promise<Record<string, Coupon> | null>;
-  set: (key: string, value: Record<string, Coupon>) => Promise<void>;
-  del: (key: string) => Promise<void>;
-}
+// Redis client singleton
+let redisClient: RedisClientType | null = null;
 
-let redis: UpstashRedis | null = null;
-try {
-  if (isRedisConfigured()) {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { Redis } = require('@upstash/redis') as { Redis: new (config: { url: string; token: string }) => UpstashRedis };
-    const url = process.env.REDIS_URL!;
-    const token = process.env.REDIS_REST_TOKEN || '';
-    redis = new Redis({ url, token });
-    console.log('[coupons] Upstash Redis configured — using Redis storage');
-  } else {
-    console.log('[coupons] Redis not configured — using JSON file storage');
+async function getRedisClient(): Promise<RedisClientType | null> {
+  if (!isRedisConfigured()) return null;
+  
+  if (!redisClient) {
+    try {
+      redisClient = createClient({ url: process.env.REDIS_URL });
+      redisClient.on('error', (err) => console.error('[coupons] Redis error:', err));
+      await redisClient.connect();
+      console.log('[coupons] Redis connected');
+    } catch (error) {
+      console.error('[coupons] Failed to connect to Redis:', error);
+      redisClient = null;
+    }
   }
-} catch (error) {
-  console.error('[coupons] Failed to initialize Redis client:', error);
-  redis = null;
+  
+  return redisClient;
 }
 
 export interface Coupon {
@@ -47,15 +45,17 @@ export type CouponValidationResult =
 const COUPONS_FILE = path.join(process.cwd(), 'data', 'coupons.json');
 
 async function readCoupons(): Promise<Record<string, Coupon>> {
-  if (isRedisConfigured() && redis) {
+  const client = await getRedisClient();
+  
+  if (client) {
     try {
-      const data = await redis.get('coupons');
-      if (data && typeof data === 'object') {
-        console.log('[coupons] Read', Object.keys(data).length, 'coupons from Redis');
-        return data as Record<string, Coupon>;
+      const data = await client.get('coupons');
+      if (data && typeof data === 'string') {
+        console.log('[coupons] Read coupons from Redis');
+        return JSON.parse(data);
       }
     } catch (error) {
-      console.error('[coupons] Redis read failed, falling back to JSON file:', error);
+      console.error('[coupons] Redis read failed, falling back to JSON:', error);
     }
   }
 
@@ -64,19 +64,21 @@ async function readCoupons(): Promise<Record<string, Coupon>> {
     console.log('[coupons] Read coupons from JSON file');
     return JSON.parse(data);
   } catch {
-    console.log('[coupons] No JSON file found, starting empty');
+    console.log('[coupons] No existing data, starting empty');
     return {};
   }
 }
 
 async function writeCoupons(coupons: Record<string, Coupon>): Promise<void> {
-  if (isRedisConfigured() && redis) {
+  const client = await getRedisClient();
+  
+  if (client) {
     try {
-      await redis.set('coupons', coupons);
-      console.log('[coupons] Wrote', Object.keys(coupons).length, 'coupons to Redis');
+      await client.set('coupons', JSON.stringify(coupons));
+      console.log('[coupons] Wrote coupons to Redis');
       return;
     } catch (error) {
-      console.error('[coupons] Redis write failed, falling back to JSON file:', error);
+      console.error('[coupons] Redis write failed, falling back to JSON:', error);
     }
   }
 
