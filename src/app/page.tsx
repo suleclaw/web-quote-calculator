@@ -101,7 +101,7 @@ export default function Home() {
           <div className="max-w-2xl mx-auto">
 
             {/* Step header */}
-            <div className={`mb-5 animate-fade-in-up`} style={{ animationDelay: '250ms' }}>
+            <div className={`mb-5 animate-fade-in-up text-center`} style={{ animationDelay: '250ms' }}>
               <h2 className="text-xl font-bold text-white mb-0.5">
                 {STEP_TITLES[step - 1].title}
               </h2>
