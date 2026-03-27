@@ -16,9 +16,10 @@ export async function POST(request: NextRequest) {
     const result = await validateCoupon(code, email);
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Coupon validation error:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Coupon validation error:', message);
     return NextResponse.json(
-      { valid: false, reason: 'not_found' },
+      { valid: false, reason: 'not_found', error: message },
       { status: 500 }
     );
   }

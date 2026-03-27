@@ -47,8 +47,9 @@ export async function POST(request: NextRequest) {
     const coupon = await createCoupon(clientEmail, discountPercent);
     return NextResponse.json({ coupon }, { status: 201 });
   } catch (error) {
-    console.error('Admin create coupon error:', error);
-    return NextResponse.json({ error: 'Failed to create coupon' }, { status: 500 });
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Admin create coupon error:', message);
+    return NextResponse.json({ error: 'Failed to create coupon', details: message }, { status: 500 });
   }
 }
 

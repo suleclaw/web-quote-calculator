@@ -21,9 +21,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Coupon apply error:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Coupon apply error:', message);
     return NextResponse.json(
-      { valid: false, reason: 'not_found' },
+      { valid: false, reason: 'not_found', error: message },
       { status: 500 }
     );
   }

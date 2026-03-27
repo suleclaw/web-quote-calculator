@@ -1,20 +1,30 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 
-// Only import KV in environments where it might be configured
-const LOCAL_MODE = !process.env.KV_REST_API_TOKEN || !process.env.KV_URL;
-
 // KV client type
 interface KVClient {
   get: (key: string) => Promise<Record<string, Coupon> | null>;
   set: (key: string, value: Record<string, Coupon>) => Promise<void>;
 }
 
+// Check KV availability at runtime (not build time)
+function isKVConfigured(): boolean {
+  return !!(process.env.KV_REST_API_TOKEN && process.env.KV_URL);
+}
+
 let kv: KVClient | null = null;
-if (!LOCAL_MODE) {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const vercelKv = require('@vercel/kv') as { kv: KVClient };
-  kv = vercelKv.kv;
+try {
+  if (isKVConfigured()) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const vercelKv = require('@vercel/kv') as { kv: KVClient };
+    kv = vercelKv.kv;
+    console.log('[coupons] Vercel KV configured — using Redis storage');
+  } else {
+    console.log('[coupons] KV not configured — using JSON file storage');
+  }
+} catch (error) {
+  console.error('[coupons] Failed to initialize KV client:', error);
+  kv = null;
 }
 
 export interface Coupon {
@@ -34,40 +44,45 @@ export type CouponValidationResult =
 const COUPONS_FILE = path.join(process.cwd(), 'data', 'coupons.json');
 
 async function readCoupons(): Promise<Record<string, Coupon>> {
-  // Try KV first if available
-  if (!LOCAL_MODE && kv) {
+  // Try KV first if configured
+  if (isKVConfigured() && kv) {
     try {
       const data = await kv.get('coupons');
       if (data) {
+        console.log('[coupons] Read', Object.keys(data).length, 'coupons from KV');
         return data;
       }
     } catch (error) {
-      console.warn('KV read failed, falling back to JSON file:', error);
+      console.error('[coupons] KV read failed, falling back to JSON file:', error);
     }
   }
 
   // Fallback to JSON file for local dev
   try {
     const data = await fs.readFile(COUPONS_FILE, 'utf-8');
+    console.log('[coupons] Read coupons from JSON file');
     return JSON.parse(data);
   } catch {
+    console.log('[coupons] No JSON file found, starting empty');
     return {};
   }
 }
 
 async function writeCoupons(coupons: Record<string, Coupon>): Promise<void> {
-  // Try KV first if available
-  if (!LOCAL_MODE && kv) {
+  // Try KV first if configured
+  if (isKVConfigured() && kv) {
     try {
       await kv.set('coupons', coupons);
+      console.log('[coupons] Wrote', Object.keys(coupons).length, 'coupons to KV');
       return;
     } catch (error) {
-      console.warn('KV write failed, falling back to JSON file:', error);
+      console.error('[coupons] KV write failed, falling back to JSON file:', error);
     }
   }
 
   // Fallback to JSON file for local dev
   await fs.writeFile(COUPONS_FILE, JSON.stringify(coupons, null, 2));
+  console.log('[coupons] Wrote coupons to JSON file');
 }
 
 export async function validateCoupon(
