@@ -1,1 +1,20 @@
-{}
+{
+  "390LPZ": {
+    "code": "390LPZ",
+    "clientEmail": "test@test.com",
+    "discountPercent": 20,
+    "createdAt": "2026-03-27",
+    "expiresAt": "2026-04-10T15:40:35.929Z",
+    "used": true,
+    "usedAt": "2026-03-27T15:40:49.960Z"
+  },
+  "EJJQ62": {
+    "code": "EJJQ62",
+    "clientEmail": "test@test.com",
+    "discountPercent": 20,
+    "createdAt": "2026-03-27",
+    "expiresAt": "2026-04-10T15:42:10.647Z",
+    "used": true,
+    "usedAt": "2026-03-27T15:42:54.723Z"
+  }
+}

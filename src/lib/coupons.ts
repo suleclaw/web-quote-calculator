@@ -1,6 +1,22 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 
+// Only import KV in environments where it might be configured
+const LOCAL_MODE = !process.env.KV_REST_API_TOKEN || !process.env.KV_URL;
+
+// KV client type
+interface KVClient {
+  get: (key: string) => Promise<Record<string, Coupon> | null>;
+  set: (key: string, value: Record<string, Coupon>) => Promise<void>;
+}
+
+let kv: KVClient | null = null;
+if (!LOCAL_MODE) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const vercelKv = require('@vercel/kv') as { kv: KVClient };
+  kv = vercelKv.kv;
+}
+
 export interface Coupon {
   code: string;
   clientEmail: string;
@@ -18,6 +34,19 @@ export type CouponValidationResult =
 const COUPONS_FILE = path.join(process.cwd(), 'data', 'coupons.json');
 
 async function readCoupons(): Promise<Record<string, Coupon>> {
+  // Try KV first if available
+  if (!LOCAL_MODE && kv) {
+    try {
+      const data = await kv.get('coupons');
+      if (data) {
+        return data;
+      }
+    } catch (error) {
+      console.warn('KV read failed, falling back to JSON file:', error);
+    }
+  }
+
+  // Fallback to JSON file for local dev
   try {
     const data = await fs.readFile(COUPONS_FILE, 'utf-8');
     return JSON.parse(data);
@@ -27,6 +56,17 @@ async function readCoupons(): Promise<Record<string, Coupon>> {
 }
 
 async function writeCoupons(coupons: Record<string, Coupon>): Promise<void> {
+  // Try KV first if available
+  if (!LOCAL_MODE && kv) {
+    try {
+      await kv.set('coupons', coupons);
+      return;
+    } catch (error) {
+      console.warn('KV write failed, falling back to JSON file:', error);
+    }
+  }
+
+  // Fallback to JSON file for local dev
   await fs.writeFile(COUPONS_FILE, JSON.stringify(coupons, null, 2));
 }
 
