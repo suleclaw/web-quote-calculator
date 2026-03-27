@@ -1,30 +1,33 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 
-// KV client type
-interface KVClient {
+// Check if Upstash Redis is configured
+function isRedisConfigured(): boolean {
+  return !!process.env.REDIS_URL;
+}
+
+// Upstash Redis client
+interface UpstashRedis {
   get: (key: string) => Promise<Record<string, Coupon> | null>;
   set: (key: string, value: Record<string, Coupon>) => Promise<void>;
+  del: (key: string) => Promise<void>;
 }
 
-// Check KV availability at runtime (not build time)
-function isKVConfigured(): boolean {
-  return !!(process.env.KV_REST_API_TOKEN && process.env.KV_URL);
-}
-
-let kv: KVClient | null = null;
+let redis: UpstashRedis | null = null;
 try {
-  if (isKVConfigured()) {
+  if (isRedisConfigured()) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const vercelKv = require('@vercel/kv') as { kv: KVClient };
-    kv = vercelKv.kv;
-    console.log('[coupons] Vercel KV configured — using Redis storage');
+    const { Redis } = require('@upstash/redis') as { Redis: new (config: { url: string; token: string }) => UpstashRedis };
+    const url = process.env.REDIS_URL!;
+    const token = process.env.REDIS_REST_TOKEN || '';
+    redis = new Redis({ url, token });
+    console.log('[coupons] Upstash Redis configured — using Redis storage');
   } else {
-    console.log('[coupons] KV not configured — using JSON file storage');
+    console.log('[coupons] Redis not configured — using JSON file storage');
   }
 } catch (error) {
-  console.error('[coupons] Failed to initialize KV client:', error);
-  kv = null;
+  console.error('[coupons] Failed to initialize Redis client:', error);
+  redis = null;
 }
 
 export interface Coupon {
@@ -44,20 +47,18 @@ export type CouponValidationResult =
 const COUPONS_FILE = path.join(process.cwd(), 'data', 'coupons.json');
 
 async function readCoupons(): Promise<Record<string, Coupon>> {
-  // Try KV first if configured
-  if (isKVConfigured() && kv) {
+  if (isRedisConfigured() && redis) {
     try {
-      const data = await kv.get('coupons');
-      if (data) {
-        console.log('[coupons] Read', Object.keys(data).length, 'coupons from KV');
-        return data;
+      const data = await redis.get('coupons');
+      if (data && typeof data === 'object') {
+        console.log('[coupons] Read', Object.keys(data).length, 'coupons from Redis');
+        return data as Record<string, Coupon>;
       }
     } catch (error) {
-      console.error('[coupons] KV read failed, falling back to JSON file:', error);
+      console.error('[coupons] Redis read failed, falling back to JSON file:', error);
     }
   }
 
-  // Fallback to JSON file for local dev
   try {
     const data = await fs.readFile(COUPONS_FILE, 'utf-8');
     console.log('[coupons] Read coupons from JSON file');
@@ -69,18 +70,16 @@ async function readCoupons(): Promise<Record<string, Coupon>> {
 }
 
 async function writeCoupons(coupons: Record<string, Coupon>): Promise<void> {
-  // Try KV first if configured
-  if (isKVConfigured() && kv) {
+  if (isRedisConfigured() && redis) {
     try {
-      await kv.set('coupons', coupons);
-      console.log('[coupons] Wrote', Object.keys(coupons).length, 'coupons to KV');
+      await redis.set('coupons', coupons);
+      console.log('[coupons] Wrote', Object.keys(coupons).length, 'coupons to Redis');
       return;
     } catch (error) {
-      console.error('[coupons] KV write failed, falling back to JSON file:', error);
+      console.error('[coupons] Redis write failed, falling back to JSON file:', error);
     }
   }
 
-  // Fallback to JSON file for local dev
   await fs.writeFile(COUPONS_FILE, JSON.stringify(coupons, null, 2));
   console.log('[coupons] Wrote coupons to JSON file');
 }
@@ -144,11 +143,10 @@ export async function createCoupon(
 ): Promise<Coupon> {
   const coupons = await readCoupons();
   
-  // Generate 6-char alphanumeric code
   const code = generateCouponCode();
   
   const now = new Date();
-  const expiresAt = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000); // 2 weeks
+  const expiresAt = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
 
   const coupon: Coupon = {
     code,
