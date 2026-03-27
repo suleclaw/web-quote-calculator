@@ -26,7 +26,7 @@ export default function QuoteSummary({
   const hasExtraPages = quote.extraPages > 0;
   const hasCoupon = couponDiscount && couponDiscount > 0;
   const discountAmount = hasCoupon && originalTotal ? Math.round((originalTotal * couponDiscount) / 100) : 0;
-  const finalTotal = hasCoupon ? originalTotal! - discountAmount : quote.total;
+  const finalTotal = hasCoupon && originalTotal ? originalTotal - discountAmount : quote.total;
 
   return (
     <div className="space-y-4">

@@ -6,6 +6,7 @@ import PageSelector from '@/components/PageSelector';
 import FeatureSelector from '@/components/FeatureSelector';
 import QuoteSummary from '@/components/QuoteSummary';
 import InquiryForm from '@/components/InquiryForm';
+import { calculateQuote } from '@/lib/pricing';
 
 const TOTAL_STEPS = 4;
 
@@ -70,6 +71,8 @@ export default function Home() {
       setCouponDiscount(null);
     }
   };
+
+  const quote = calculateQuote(selectedPages, selectedFeatures);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -180,7 +183,7 @@ export default function Home() {
                     siteType={siteType}
                     couponDiscount={couponStatus === 'valid' ? couponDiscount : null}
                     couponCode={couponStatus === 'valid' ? couponCode : null}
-                    originalTotal={null}
+                    originalTotal={quote.total}
                   />
                 </div>
               )}
