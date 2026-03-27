@@ -84,10 +84,9 @@ export default function AdminPage() {
     setAuthError('');
     setAuthLoading(true);
     try {
-      const res = await fetch('/api/admin/coupons', {
+      const res = await fetch('/api/admin/auth', {
         method: 'POST',
         headers: { 'x-admin-password': password },
-        body: JSON.stringify({}),
       });
       if (res.ok) {
         sessionStorage.setItem('admin_authed', 'true');
