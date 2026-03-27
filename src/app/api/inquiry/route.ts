@@ -7,7 +7,7 @@ const config = {
   port: 587,
   secure: false,
   user: 'suleclaw@gmail.com',
-  pass: 'eovu odit excb tbqq',
+  pass: 'qozy yyqk diyy ygfe',
 };
 
 export async function POST(request: NextRequest) {
