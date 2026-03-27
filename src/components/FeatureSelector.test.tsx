@@ -37,6 +37,6 @@ describe('FeatureSelector', () => {
 
   it('displays feature prices', () => {
     render(<FeatureSelector selected={[]} onChange={mockOnChange} />);
-    expect(screen.getByText('+£80')).toBeDefined(); // AI Chatbot price
+    expect(screen.getByText('+£100')).toBeDefined(); // AI Chatbot price
   });
 });

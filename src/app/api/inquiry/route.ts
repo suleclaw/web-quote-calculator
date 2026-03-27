@@ -6,8 +6,8 @@ const config = {
   host: 'smtp.gmail.com',
   port: 587,
   secure: false,
-  user: 'dami.dev.fx@gmail.com',
-  pass: 'ihil nsmr mynd kdle',
+  user: 'suleclaw@gmail.com',
+  pass: 'eovu odit excb tbqq',
 };
 
 export async function POST(request: NextRequest) {
@@ -51,8 +51,8 @@ Extra Features:
 ${featureList}
 
 Quote Breakdown:
-  Base (4 pages + shell): £${quote.basePrice}
-  Extra pages (${quote.extraPages} × £10): £${quote.pagesCost}
+  Base website (${selectedPages.length} page${selectedPages.length === 1 ? '' : 's'}): £${quote.basePrice}
+  Extra pages (${quote.extraPages} × £50): £${quote.pagesCost}
   Features: £${quote.featuresCost}
   ---------------------------------
   Total: £${quote.total}

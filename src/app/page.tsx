@@ -6,7 +6,6 @@ import PageSelector from '@/components/PageSelector';
 import FeatureSelector from '@/components/FeatureSelector';
 import QuoteSummary from '@/components/QuoteSummary';
 import InquiryForm from '@/components/InquiryForm';
-import ThemeToggle from '@/components/ThemeToggle';
 
 const TOTAL_STEPS = 4;
 
@@ -72,7 +71,6 @@ export default function Home() {
       <div className="bg-grid absolute inset-0 pointer-events-none" />
 
       {/* Content */}
-      <ThemeToggle />
       <div className={`relative z-10 min-h-screen flex flex-col ${mounted ? '' : 'opacity-0'}`}
            style={{ transition: 'opacity 0.5s ease' }}>
 

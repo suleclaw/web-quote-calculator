@@ -41,6 +41,32 @@ src/
 │   └── InquiryForm.tsx     # Contact form (step 4)
 ```
 
+## Pricing
+
+### Website Packages
+
+| Package | Price |
+|---------|-------|
+| One-page website | £210 |
+| Multi-page website (up to 4 pages) | £350 |
+| Additional pages | £50 each |
+
+### Optional Features
+
+| Feature | Price |
+|---------|-------|
+| AI Chatbot | £100 |
+| Shopping Cart + Payments (E-commerce) | £400 |
+| Booking / Reservations | £250 |
+| CMS / Blog | £120 |
+| User Accounts | £120 |
+| Newsletter Signup | £50 |
+| Social Media Integration | £30 |
+| Google Analytics | £25 |
+| Multi-language Support | £80 |
+
+All prices are estimates and may vary based on project complexity.
+
 ## Deploy
 
 Deploy to Vercel with one click:

@@ -1,6 +1,7 @@
-export const BASE_PRICE = 100;
+export const BASE_PRICE = 210;       // 1-page website
+export const MULTI_PAGE_PRICE = 350; // 4-page website
 export const PAGES_INCLUDED = 4;
-export const PRICE_PER_EXTRA_PAGE = 10;
+export const PRICE_PER_EXTRA_PAGE = 50;
 
 export const PAGES = [
   { id: 'home', label: 'Home', description: 'Landing page with hero section and overview' },
@@ -16,20 +17,25 @@ export const PAGES = [
 ];
 
 export const FEATURES = [
-  { id: 'ai-chatbot', label: 'AI Chatbot', price: 80, description: 'Intelligent assistant for visitor support' },
-  { id: 'shopping-cart', label: 'Shopping Cart + Payments', price: 120, description: 'E-commerce with checkout and payment processing' },
-  { id: 'booking', label: 'Booking / Reservations', price: 90, description: 'Appointment scheduling system' },
-  { id: 'cms', label: 'CMS / Blog', price: 60, description: 'Manage your own content and articles' },
-  { id: 'user-accounts', label: 'User Accounts', price: 70, description: 'Login, profiles, and saved data' },
-  { id: 'newsletter', label: 'Newsletter Signup', price: 30, description: 'Email list collection' },
-  { id: 'social', label: 'Social Media Integration', price: 20, description: 'Connect your social profiles' },
-  { id: 'analytics', label: 'Google Analytics', price: 15, description: 'Visitor tracking and reporting' },
-  { id: 'multilang', label: 'Multi-language Support', price: 50, description: 'Localized content in multiple languages' },
+  { id: 'ai-chatbot', label: 'AI Chatbot', price: 100, description: 'Intelligent assistant for visitor support' },
+  { id: 'shopping-cart', label: 'Shopping Cart + Payments', price: 400, description: 'E-commerce with checkout and payment processing' },
+  { id: 'booking', label: 'Booking / Reservations', price: 250, description: 'Appointment scheduling system' },
+  { id: 'cms', label: 'CMS / Blog', price: 120, description: 'Manage your own content and articles' },
+  { id: 'user-accounts', label: 'User Accounts', price: 120, description: 'Login, profiles, and saved data' },
+  { id: 'newsletter', label: 'Newsletter Signup', price: 50, description: 'Email list collection' },
+  { id: 'social', label: 'Social Media Integration', price: 30, description: 'Connect your social profiles' },
+  { id: 'analytics', label: 'Google Analytics', price: 25, description: 'Visitor tracking and reporting' },
+  { id: 'multilang', label: 'Multi-language Support', price: 80, description: 'Localized content in multiple languages' },
 ];
 
 export function calculateQuote(selectedPageIds: string[], selectedFeatureIds: string[]) {
   const pageCount = selectedPageIds.length;
-  const extraPages = Math.max(0, pageCount - PAGES_INCLUDED);
+
+  // Base price: 1 page = £210, 4 pages = £350
+  const basePrice = pageCount === 1 ? BASE_PRICE : MULTI_PAGE_PRICE;
+
+  // Extra pages beyond the 4 included in multi-page
+  const extraPages = pageCount > PAGES_INCLUDED ? pageCount - PAGES_INCLUDED : 0;
   const pagesCost = extraPages * PRICE_PER_EXTRA_PAGE;
 
   const featuresCost = selectedFeatureIds.reduce((total, id) => {
@@ -37,10 +43,10 @@ export function calculateQuote(selectedPageIds: string[], selectedFeatureIds: st
     return total + (feature?.price ?? 0);
   }, 0);
 
-  const total = BASE_PRICE + pagesCost + featuresCost;
+  const total = basePrice + pagesCost + featuresCost;
 
   return {
-    basePrice: BASE_PRICE,
+    basePrice,
     pagesCost,
     extraPages,
     featuresCost,
