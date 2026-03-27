@@ -5,9 +5,10 @@ import { PAGES, FEATURES, calculateQuote } from '@/lib/pricing';
 interface QuoteSummaryProps {
   selectedPageIds: string[];
   selectedFeatureIds: string[];
+  siteType: 'one-page' | 'multi-page';
 }
 
-export default function QuoteSummary({ selectedPageIds, selectedFeatureIds }: QuoteSummaryProps) {
+export default function QuoteSummary({ selectedPageIds, selectedFeatureIds, siteType }: QuoteSummaryProps) {
   const quote = calculateQuote(selectedPageIds, selectedFeatureIds);
   const selectedPages = PAGES.filter((p) => selectedPageIds.includes(p.id));
   const selectedFeatures = FEATURES.filter((f) => selectedFeatureIds.includes(f.id));
@@ -88,6 +89,21 @@ export default function QuoteSummary({ selectedPageIds, selectedFeatureIds }: Qu
               <div className="text-xs text-[#64748b]">GBP</div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Website type */}
+      <div className="animate-fade-in">
+        <p className="text-xs font-semibold text-[#64748b] uppercase tracking-wider mb-3 px-1">
+          Website Type
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <span className="chip">
+            <svg className="w-3 h-3 mr-1.5 text-[#818cf8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+            {siteType === 'one-page' ? 'One-Page Website' : 'Multi-Page Website'}
+          </span>
         </div>
       </div>
 

@@ -13,9 +13,9 @@ const config = {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, selectedPageIds, selectedFeatureIds } = body;
+    const { name, email, selectedPageIds, selectedFeatureIds, siteType } = body;
 
-    if (!name || !email || !selectedPageIds || !selectedFeatureIds) {
+    if (!name || !email || !selectedPageIds || !selectedFeatureIds || !siteType) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
@@ -43,6 +43,8 @@ New Website Quote Inquiry
 Client Details:
   Name: ${name}
   Email: ${email}
+
+Website Type: ${siteType === 'one-page' ? 'One-Page Website' : 'Multi-Page Website'}
 
 Selected Pages:
 ${pageList}

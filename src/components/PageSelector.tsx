@@ -76,9 +76,6 @@ export default function PageSelector({ selected, onChange, siteType, onSiteTypeC
 
   const handleSiteTypeChange = (type: 'one-page' | 'multi-page') => {
     onSiteTypeChange(type);
-    if (type === 'one-page') {
-      onChange(selected.includes('home') ? ['home'] : []);
-    }
   };
 
   return (
@@ -117,10 +114,12 @@ export default function PageSelector({ selected, onChange, siteType, onSiteTypeC
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
           </svg>
-          {isOnePage ? 'Single landing page' : 'First 4 pages included'}
+          {isOnePage ? 'Choose sections for your landing page' : 'First 4 pages included'}
         </div>
         <div className="ml-auto text-xs text-[#818cf8] bg-[rgba(129,140,248,0.1)] border border-[rgba(129,140,248,0.2)] rounded-full px-2.5 py-0.5 font-medium">
-          {isOnePage ? '1 page' : `${selected.length} selected`}
+          {isOnePage
+            ? `${selected.length} ${selected.length === 1 ? 'section' : 'sections'} selected`
+            : `${selected.length} selected`}
         </div>
       </div>
 

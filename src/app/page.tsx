@@ -50,6 +50,7 @@ export default function Home() {
           email: clientEmail,
           selectedPageIds: selectedPages,
           selectedFeatureIds: selectedFeatures,
+          siteType,
         }),
       });
 
@@ -128,7 +129,7 @@ export default function Home() {
 
               {(step === 3 || step === 4) && (
                 <div className="animate-scale-in">
-                  <QuoteSummary selectedPageIds={selectedPages} selectedFeatureIds={selectedFeatures} />
+                  <QuoteSummary selectedPageIds={selectedPages} selectedFeatureIds={selectedFeatures} siteType={siteType} />
                 </div>
               )}
 

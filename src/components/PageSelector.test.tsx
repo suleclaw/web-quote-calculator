@@ -23,9 +23,14 @@ describe('PageSelector', () => {
     expect(screen.getByText('2 selected')).toBeDefined();
   });
 
-  it('shows "1 page" in one-page mode', () => {
+  it('shows section count in one-page mode', () => {
     render(<PageSelector selected={['home']} onChange={mockOnChange} siteType="one-page" onSiteTypeChange={mockOnSiteTypeChange} />);
-    expect(screen.getByText('1 page')).toBeDefined();
+    expect(screen.getByText('1 section selected')).toBeDefined();
+  });
+
+  it('shows plural sections count in one-page mode with multiple selections', () => {
+    render(<PageSelector selected={['home', 'about', 'services']} onChange={mockOnChange} siteType="one-page" onSiteTypeChange={mockOnSiteTypeChange} />);
+    expect(screen.getByText('3 sections selected')).toBeDefined();
   });
 
   it('calls onChange when a page is selected', () => {
@@ -56,11 +61,17 @@ describe('PageSelector', () => {
     expect(mockOnSiteTypeChange).toHaveBeenCalledWith('one-page');
   });
 
-  it('in one-page mode, selecting home deselects other pages', () => {
+  it('in one-page mode, clicking an already-selected section deselects it', () => {
     render(<PageSelector selected={['home', 'about']} onChange={mockOnChange} siteType="one-page" onSiteTypeChange={mockOnSiteTypeChange} />);
     const homeButton = screen.getByText('Home').closest('button');
     fireEvent.click(homeButton!);
-    // In one-page mode, clicking home (already selected) deselects it
     expect(mockOnChange).toHaveBeenCalledWith(['about']);
+  });
+
+  it('in one-page mode, multiple sections can be selected', () => {
+    render(<PageSelector selected={['home']} onChange={mockOnChange} siteType="one-page" onSiteTypeChange={mockOnSiteTypeChange} />);
+    const aboutButton = screen.getByText('About').closest('button');
+    fireEvent.click(aboutButton!);
+    expect(mockOnChange).toHaveBeenCalledWith(['home', 'about']);
   });
 });
