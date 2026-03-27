@@ -9,7 +9,7 @@ interface InquiryFormProps {
   onNameChange: (v: string) => void;
   onEmailChange: (v: string) => void;
   onCouponChange: (v: string) => void;
-  onCouponBlur: () => void;
+  onCouponValidate: () => void;
   onSubmit: () => Promise<void>;
   isSubmitting: boolean;
   isSuccess: boolean;
@@ -25,7 +25,7 @@ export default function InquiryForm({
   onNameChange,
   onEmailChange,
   onCouponChange,
-  onCouponBlur,
+  onCouponValidate,
   onSubmit,
   isSubmitting,
   isSuccess,
@@ -101,16 +101,24 @@ export default function InquiryForm({
           <label htmlFor="coupon" className="block text-sm font-medium text-[#94a3b8] pl-1">
             Coupon Code <span className="text-[#64748b]">(optional)</span>
           </label>
-          <input
-            id="coupon"
-            type="text"
-            value={couponCode}
-            onChange={(e) => onCouponChange(e.target.value.toUpperCase())}
-            onBlur={onCouponBlur}
-            placeholder="e.g. DAMI20"
-            className="form-input font-mono tracking-wider"
-            autoComplete="off"
-          />
+          <div className="flex gap-2">
+            <input
+              id="coupon"
+              type="text"
+              value={couponCode}
+              onChange={(e) => onCouponChange(e.target.value.toUpperCase())}
+              placeholder="e.g. DAMI20"
+              className="form-input font-mono tracking-wider flex-1"
+              autoComplete="off"
+            />
+            <button
+              type="button"
+              onClick={onCouponValidate}
+              className="px-4 py-2 rounded-lg bg-[rgba(129,140,248,0.1)] border border-[rgba(129,140,248,0.2)] text-[#818cf8] text-sm font-medium hover:bg-[rgba(129,140,248,0.15)] transition-colors"
+            >
+              Validate
+            </button>
+          </div>
         </div>
 
         {/* Coupon validation feedback */}

@@ -199,7 +199,7 @@ export default function Home() {
                     onNameChange={setClientName}
                     onEmailChange={setClientEmail}
                     onCouponChange={setCouponCode}
-                    onCouponBlur={handleCouponBlur}
+                    onCouponValidate={handleCouponBlur}
                     onSubmit={handleSubmit}
                     isSubmitting={isSubmitting}
                     isSuccess={isSuccess}
@@ -219,7 +219,7 @@ export default function Home() {
                     onNameChange={setClientName}
                     onEmailChange={setClientEmail}
                     onCouponChange={setCouponCode}
-                    onCouponBlur={handleCouponBlur}
+                    onCouponValidate={handleCouponBlur}
                     onSubmit={handleSubmit}
                     isSubmitting={isSubmitting}
                     isSuccess={isSuccess}
