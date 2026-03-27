@@ -69,12 +69,8 @@ export default function PageSelector({ selected, onChange, siteType, onSiteTypeC
     if (selected.includes(id)) {
       onChange(selected.filter((p) => p !== id));
     } else {
-      if (isOnePage) {
-        onChange([id]);
-      } else {
-        // Multi-page: no hard limit, extra pages beyond 4 cost £50
-        onChange([...selected, id]);
-      }
+      // In one-page mode, each selected page becomes a section on the landing page
+      onChange([...selected, id]);
     }
   };
 
@@ -131,7 +127,7 @@ export default function PageSelector({ selected, onChange, siteType, onSiteTypeC
       <div className="grid gap-3 sm:grid-cols-2 stagger-children">
         {PAGES.map((page) => {
           const isSelected = selected.includes(page.id);
-          const isDisabled = isOnePage && page.id !== 'home' && !selected.includes('home');
+          const isDisabled = false;
 
           return (
             <button
