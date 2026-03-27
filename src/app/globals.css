@@ -472,90 +472,191 @@ body {
 }
 
 /* ==================== LIGHT THEME ==================== */
+/* Editorial warmth — cream tones, amber accents, refined & premium */
 .light {
-  --bg-base: #f8fafc;
+  --bg-base: #faf9f7;
   --bg-elevated: #ffffff;
   --bg-card: #ffffff;
-  --bg-card-hover: #f1f5f9;
-  --border: rgba(0, 0, 0, 0.08);
-  --border-active: rgba(99, 102, 241, 0.4);
-  --accent: #6366f1;
-  --accent-glow: rgba(99, 102, 241, 0.15);
-  --accent-dark: #4f46e5;
+  --bg-card-hover: #f5f3f0;
+  --border: rgba(15, 15, 15, 0.07);
+  --border-active: rgba(180, 100, 50, 0.4);
+  --accent: #b46432;
+  --accent-glow: rgba(180, 100, 50, 0.12);
+  --accent-dark: #8b4513;
   --accent-amber: #d97706;
   --accent-amber-glow: rgba(217, 119, 6, 0.1);
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --text-primary: #1a1714;
+  --text-secondary: #5c534a;
+  --text-muted: #9c9189;
   --success: #059669;
   --success-bg: rgba(5, 150, 105, 0.08);
   --error: #dc2626;
   --error-bg: rgba(220, 38, 38, 0.08);
 }
 
-/* Light theme background grid */
+/* Light theme background grid — warm subtle lines */
 .light .bg-grid {
   background-image:
-    linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+    linear-gradient(rgba(15,15,15,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15,15,15,0.015) 1px, transparent 1px);
 }
 
-/* Light theme ambient glow */
+/* Light theme ambient glow — warm amber */
 .light .ambient-glow {
-  background: radial-gradient(ellipse, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(180, 120, 60, 0.1) 0%, transparent 70%);
 }
 
-/* Light theme card hover */
+/* Light theme card */
+.light .card {
+  background: var(--bg-card);
+  border-color: var(--border);
+  box-shadow: 0 2px 8px rgba(15, 10, 5, 0.04), 0 1px 2px rgba(15, 10, 5, 0.03);
+}
+
 .light .card:hover {
-  border-color: rgba(0,0,0,0.1);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  border-color: rgba(15, 15, 15, 0.12);
+  box-shadow: 0 8px 32px rgba(15, 10, 5, 0.08), 0 2px 8px rgba(15, 10, 5, 0.04);
 }
 
 /* Light theme selection card */
 .light .select-card {
-  border-color: rgba(0, 0, 0, 0.06);
+  border-color: var(--border);
+  background: var(--bg-card);
 }
 
 .light .select-card:hover {
-  border-color: rgba(0,0,0,0.12);
+  border-color: rgba(15, 15, 15, 0.14);
   background: var(--bg-card-hover);
 }
 
 .light .select-card.selected {
-  background: rgba(99, 102, 241, 0.06);
+  border-color: var(--accent);
+  background: rgba(180, 100, 50, 0.06);
+  box-shadow: 0 0 0 1px var(--accent), 0 4px 16px rgba(180, 100, 50, 0.1);
 }
 
-/* Light theme buttons */
+/* Light theme primary button — warm terracotta */
+.light .btn-primary {
+  background: linear-gradient(135deg, #c26832, #a0522d);
+  box-shadow: 0 4px 14px rgba(180, 100, 50, 0.3);
+}
+
+.light .btn-primary:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(180, 100, 50, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Light theme secondary button */
 .light .btn-secondary {
   color: var(--text-secondary);
-  border-color: rgba(0, 0, 0, 0.08);
+  border-color: rgba(15, 15, 15, 0.1);
+  background: transparent;
 }
 
 .light .btn-secondary:hover:not(:disabled) {
   background: var(--bg-card-hover);
   color: var(--text-primary);
-  border-color: rgba(0, 0, 0, 0.12);
+  border-color: rgba(15, 15, 15, 0.15);
 }
 
 /* Light theme form inputs */
 .light .form-input {
   background: var(--bg-elevated);
-  border-color: rgba(0, 0, 0, 0.08);
+  border-color: rgba(15, 15, 15, 0.1);
   color: var(--text-primary);
+}
+
+.light .form-input::placeholder {
+  color: var(--text-muted);
 }
 
 .light .form-input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
+  box-shadow: 0 0 0 3px rgba(180, 100, 50, 0.12);
 }
 
 /* Light theme step indicator */
 .light .step-dot.inactive {
   background: var(--bg-elevated);
-  border-color: rgba(0, 0, 0, 0.08);
+  border-color: rgba(15, 15, 15, 0.1);
   color: var(--text-muted);
 }
 
+.light .step-dot.active {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 0 20px rgba(180, 100, 50, 0.25);
+}
+
 .light .step-connector {
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(15, 15, 15, 0.08);
+}
+
+.light .step-connector.completed {
+  background: var(--success);
+}
+
+/* Light theme checkbox */
+.light .checkbox {
+  border-color: var(--text-muted);
+}
+
+.light .checkbox.checked {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 12px rgba(180, 100, 50, 0.2);
+}
+
+/* Light theme price tag */
+.light .price-tag {
+  background: linear-gradient(135deg, rgba(180, 100, 50, 0.1), rgba(160, 80, 30, 0.06));
+  border-color: rgba(180, 100, 50, 0.2);
+  color: var(--accent);
+}
+
+/* Light theme quote total */
+.light .quote-total {
+  background: linear-gradient(135deg, rgba(180, 100, 50, 0.08), rgba(160, 80, 30, 0.04));
+  border-color: rgba(180, 100, 50, 0.15);
+}
+
+/* Light theme theme toggle */
+.light .theme-toggle {
+  background: var(--bg-elevated);
+  border-color: rgba(15, 15, 15, 0.1);
+  color: var(--text-secondary);
+}
+
+.light .theme-toggle:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: rgba(15, 15, 15, 0.15);
+}
+
+/* Light theme scrollbar */
+.light ::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(15, 15, 15, 0.12);
+}
+
+/* Light theme success */
+.light .success-ring {
+  background: var(--success-bg);
+  border-color: rgba(5, 150, 105, 0.2);
+}
+
+/* Light theme selection color */
+.light ::selection {
+  background: rgba(180, 100, 50, 0.2);
+  color: var(--text-primary);
+}
+
+/* Light theme chip */
+.light .chip {
+  background: var(--bg-elevated);
+  border-color: rgba(15, 15, 15, 0.08);
+  color: var(--text-secondary);
 }
