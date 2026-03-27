@@ -4,7 +4,7 @@ import { getAllCoupons, createCoupon, deleteCoupon } from '@/lib/coupons';
 function checkAdminAuth(request: NextRequest): boolean {
   const adminPassword = process.env.ADMIN_PASSWORD;
   const providedPassword = request.headers.get('x-admin-password');
-  return adminPassword && providedPassword === adminPassword;
+  return adminPassword !== undefined && providedPassword === adminPassword;
 }
 
 export async function GET(request: NextRequest) {
