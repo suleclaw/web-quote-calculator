@@ -64,7 +64,6 @@ const PAGE_ICONS: Record<string, React.ReactNode> = {
 
 export default function PageSelector({ selected, onChange, siteType, onSiteTypeChange }: PageSelectorProps) {
   const isOnePage = siteType === 'one-page';
-  const maxPages = isOnePage ? 1 : 4;
 
   const togglePage = (id: string) => {
     if (selected.includes(id)) {
@@ -72,7 +71,8 @@ export default function PageSelector({ selected, onChange, siteType, onSiteTypeC
     } else {
       if (isOnePage) {
         onChange([id]);
-      } else if (selected.length < maxPages) {
+      } else {
+        // Multi-page: no hard limit, extra pages beyond 4 cost £50
         onChange([...selected, id]);
       }
     }
